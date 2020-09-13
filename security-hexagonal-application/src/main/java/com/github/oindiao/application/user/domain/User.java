@@ -12,9 +12,6 @@ import java.time.LocalDate;
 @Getter
 public class User {
 
-    @Value("${password.days-expration:10}")
-    public Integer passwordExpirationDays;
-
     @NotNull
     @NotEmpty
     @Email
