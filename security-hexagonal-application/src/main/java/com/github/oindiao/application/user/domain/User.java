@@ -42,6 +42,10 @@ public class User {
 
     public static User of(String email, String password, LocalDate expirationPasswordDate, Boolean active, String profile) {
 
+        if (active == Boolean.FALSE) {
+            throw new UserException("User inactive.");
+        }
+
         LocalDate todayMinus120Days = LocalDate.now().minusDays(120);
 
         if (expirationPasswordDate.isBefore(todayMinus120Days) || expirationPasswordDate.isEqual(todayMinus120Days)) {

@@ -96,6 +96,66 @@ public class UserTest {
 
     }
 
+    @Test
+    @DisplayName("Create user with valid profile")
+    void verifyCreateUserWithValidProfile() {
+        // Arrange
+
+        String profile = "ROLE_ADMIN";
+
+        // Act
+
+        User user = User.of(easyRandom.nextObject(String.class),
+                easyRandom.nextObject(String.class),
+                LocalDate.now(),
+                Boolean.TRUE,
+                profile
+        );
+
+        // Assert
+        assertTrue(user.getActive());
+    }
+
+    @Test
+    @DisplayName("Dont create user inactive")
+    void dontCreateUserInactive(){
+
+        // Arrange
+
+        Boolean active = Boolean.FALSE;
+
+        // Act - Assert
+        assertThrows(UserException.class, () ->
+                User.of(easyRandom.nextObject(String.class),
+                        easyRandom.nextObject(String.class),
+                        LocalDate.now(),
+                        active,
+                        easyRandom.nextObject(Profile.class).name()
+                )
+        );
+
+    }
+
+    @Test
+    @DisplayName("Create user active")
+    void verifyCreateUserWithActive() {
+        // Arrange
+
+        Boolean active = Boolean.TRUE;
+
+        // Act
+
+        User user = User.of(easyRandom.nextObject(String.class),
+                easyRandom.nextObject(String.class),
+                LocalDate.now(),
+                active,
+                easyRandom.nextObject(Profile.class).name()
+        );
+
+        // Assert
+        assertTrue(user.getActive());
+    }
+
     
 
 }
