@@ -1,19 +1,21 @@
-package com.github.oindiao.application.user.domain;
-
-import com.github.oindiao.common.exception.UserException;
-import org.jeasy.random.EasyRandom;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
+package com.github.oindiao.application.domain;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.github.oindiao.common.exception.UserException;
+import com.github.oindiao.common.util.EasyRandomWithEmail;
+
 public class UserTest {
 
-    EasyRandom easyRandom = new EasyRandom();
+	EasyRandomWithEmail easyRandom = new EasyRandomWithEmail();
 
     LocalDate today;
 
@@ -31,11 +33,11 @@ public class UserTest {
 
         // Act - Assert
         assertThrows(UserException.class, () ->
-                User.of(easyRandom.nextObject(String.class),
+                User.of(easyRandom.email(),
                         easyRandom.nextObject(String.class),
                         todayMinus121Days,
                         Boolean.TRUE,
-                        easyRandom.nextObject(Profile.class).name()
+                        Arrays.asList(easyRandom.nextObject(Profile.class).name())
                 )
         );
     }
@@ -49,11 +51,11 @@ public class UserTest {
 
         // Act - Assert
         assertThrows(UserException.class, () ->
-                User.of(easyRandom.nextObject(String.class),
+                User.of(easyRandom.email(),
                         easyRandom.nextObject(String.class),
                         todayMinus120Days,
                         Boolean.TRUE,
-                        easyRandom.nextObject(Profile.class).name()
+                        Arrays.asList(easyRandom.nextObject(Profile.class).name())
                 )
         );
     }
@@ -66,11 +68,11 @@ public class UserTest {
         LocalDate todayMinus119Days = this.today.minusDays(119);
 
         // Act
-        User user = User.of(easyRandom.nextObject(String.class),
+        User user = User.of(easyRandom.email(),
                 easyRandom.nextObject(String.class),
                 todayMinus119Days,
                 Boolean.TRUE,
-                easyRandom.nextObject(Profile.class).name()
+                Arrays.asList(easyRandom.nextObject(Profile.class).name())
         );
 
         // Assert
@@ -86,11 +88,11 @@ public class UserTest {
 
         // Act - Assert
         assertThrows(UserException.class, () ->
-                User.of(easyRandom.nextObject(String.class),
+                User.of(easyRandom.email(),
                         easyRandom.nextObject(String.class),
                         LocalDate.now(),
                         Boolean.TRUE,
-                        profile
+                        Arrays.asList(profile)
                 )
         );
 
@@ -105,11 +107,11 @@ public class UserTest {
 
         // Act
 
-        User user = User.of(easyRandom.nextObject(String.class),
+        User user = User.of(easyRandom.email(),
                 easyRandom.nextObject(String.class),
                 LocalDate.now(),
                 Boolean.TRUE,
-                profile
+                Arrays.asList(profile)
         );
 
         // Assert
@@ -117,7 +119,7 @@ public class UserTest {
     }
 
     @Test
-    @DisplayName("Dont create user inactive")
+    @DisplayName("Don't create user inactive")
     void dontCreateUserInactive(){
 
         // Arrange
@@ -126,11 +128,11 @@ public class UserTest {
 
         // Act - Assert
         assertThrows(UserException.class, () ->
-                User.of(easyRandom.nextObject(String.class),
+                User.of(easyRandom.email(),
                         easyRandom.nextObject(String.class),
                         LocalDate.now(),
                         active,
-                        easyRandom.nextObject(Profile.class).name()
+                        Arrays.asList(easyRandom.nextObject(Profile.class).name())
                 )
         );
 
@@ -145,11 +147,11 @@ public class UserTest {
 
         // Act
 
-        User user = User.of(easyRandom.nextObject(String.class),
-                easyRandom.nextObject(String.class),
+        User user = User.of(easyRandom.email(),
+                easyRandom.email(),
                 LocalDate.now(),
                 active,
-                easyRandom.nextObject(Profile.class).name()
+                Arrays.asList(easyRandom.nextObject(Profile.class).name())
         );
 
         // Assert
