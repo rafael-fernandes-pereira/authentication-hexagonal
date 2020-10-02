@@ -5,13 +5,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.github.oindiao</groupId>
-	<artifactId>security-hexagonal</artifactId>
+	<artifactId>authentication-hexagonal</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<modules>
-		<module>security-hexagonal-application</module>
-		<module>security-hexagonal-common</module>
-	</modules>
+		<module>authentication-hexagonal-application</module>
+		<module>authentication-hexagonal-common</module>
+        <module>authentication-hexagonal-adapter</module>
+    </modules>
 
 	<dependencies>
 		<dependency>
