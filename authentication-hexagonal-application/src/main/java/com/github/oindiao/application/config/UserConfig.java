@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserConfig {
 
-    @Value("${expiration.days}")
-    private Integer expirationDays;
+    @Value("${expiration.token.days}")
+    private Integer expirationTokenDays;
 
-    public Integer getExpirationDays() {
-        return expirationDays;
+    public Integer getExpirationTokenDays() {
+        return expirationTokenDays;
     }
 }

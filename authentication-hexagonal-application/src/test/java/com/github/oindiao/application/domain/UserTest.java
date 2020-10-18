@@ -2,16 +2,20 @@ package com.github.oindiao.application.domain;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import com.github.oindiao.application.config.UserConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.github.oindiao.common.exception.UserException;
 import com.github.oindiao.common.util.EasyRandomWithEmail;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 public class UserTest {
 
@@ -19,9 +23,12 @@ public class UserTest {
 
     LocalDate today;
 
+    UserConfig config = Mockito.mock(UserConfig.class);
+
     @BeforeEach
     void setup() {
         today = LocalDate.now();
+        when(config.getExpirationTokenDays()).thenReturn(120);
     }
 
     @Test
@@ -36,6 +43,7 @@ public class UserTest {
                 User.of(easyRandom.email(),
                         easyRandom.nextObject(String.class),
                         todayMinus121Days,
+                        config.getExpirationTokenDays(),
                         Boolean.TRUE,
                         Arrays.asList(easyRandom.nextObject(Profile.class).name())
                 )
@@ -54,6 +62,7 @@ public class UserTest {
                 User.of(easyRandom.email(),
                         easyRandom.nextObject(String.class),
                         todayMinus120Days,
+                        config.getExpirationTokenDays(),
                         Boolean.TRUE,
                         Arrays.asList(easyRandom.nextObject(Profile.class).name())
                 )
@@ -71,6 +80,7 @@ public class UserTest {
         User user = User.of(easyRandom.email(),
                 easyRandom.nextObject(String.class),
                 todayMinus119Days,
+                config.getExpirationTokenDays(),
                 Boolean.TRUE,
                 Arrays.asList(easyRandom.nextObject(Profile.class).name())
         );
@@ -91,6 +101,7 @@ public class UserTest {
                 User.of(easyRandom.email(),
                         easyRandom.nextObject(String.class),
                         LocalDate.now(),
+                        config.getExpirationTokenDays(),
                         Boolean.TRUE,
                         Arrays.asList(profile)
                 )
@@ -110,6 +121,7 @@ public class UserTest {
         User user = User.of(easyRandom.email(),
                 easyRandom.nextObject(String.class),
                 LocalDate.now(),
+                config.getExpirationTokenDays(),
                 Boolean.TRUE,
                 Arrays.asList(profile)
         );
@@ -131,6 +143,7 @@ public class UserTest {
                 User.of(easyRandom.email(),
                         easyRandom.nextObject(String.class),
                         LocalDate.now(),
+                        config.getExpirationTokenDays(),
                         active,
                         Arrays.asList(easyRandom.nextObject(Profile.class).name())
                 )
@@ -150,6 +163,7 @@ public class UserTest {
         User user = User.of(easyRandom.email(),
                 easyRandom.email(),
                 LocalDate.now(),
+                config.getExpirationTokenDays(),
                 active,
                 Arrays.asList(easyRandom.nextObject(Profile.class).name())
         );

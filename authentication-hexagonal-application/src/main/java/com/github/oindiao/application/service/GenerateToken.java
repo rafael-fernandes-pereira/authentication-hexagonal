@@ -16,8 +16,8 @@ public class GenerateToken implements GenerateTokenUseCase {
     private final SearchUser searchUser;
     private final ValidateLogin validateLogin;
     private final CreateToken createToken;
-    private final UserConfig config;
     private final CacheToken cacheToken;
+    private final UserConfig config;
 
     public GenerateToken(ValidateData validateData, SearchUser searchUser, ValidateLogin validateLogin, CreateToken createToken, UserConfig config, CacheToken cacheToken){
         this.validateData = validateData;
@@ -45,6 +45,7 @@ public class GenerateToken implements GenerateTokenUseCase {
                     outputSearchUser.getEmail(),
                     outputSearchUser.getPassword(),
                     outputSearchUser.getExpirationPasswordDate(),
+                    this.config.getExpirationTokenDays(),
                     outputSearchUser.getActive(),
                     outputSearchUser.getProfiles()
             );
@@ -53,7 +54,7 @@ public class GenerateToken implements GenerateTokenUseCase {
 
             validateLogin.validate(inputValidateUser);
 
-            CreateToken.Input inputCreateToken = CreateToken.Input.of(user, config.getExpirationDays());
+            CreateToken.Input inputCreateToken = CreateToken.Input.of(user, config.getExpirationTokenDays());
 
             String token = createToken.create(inputCreateToken);
 

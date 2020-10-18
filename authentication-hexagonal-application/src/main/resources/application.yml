@@ -1,2 +1,4 @@
 expiration:
-  days: 2
+  token:
+    days: 2
+

@@ -1,19 +1,15 @@
 package com.github.oindiao.application.domain;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import com.github.oindiao.common.exception.UserException;
+import com.github.oindiao.common.validation.SelfValidating;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.github.oindiao.common.exception.UserException;
-import com.github.oindiao.common.validation.SelfValidating;
-
-import lombok.Getter;
-
-@Getter
 public class User extends SelfValidating<User>{
 
     @NotEmpty
@@ -40,7 +36,7 @@ public class User extends SelfValidating<User>{
         this.validateSelf();
     }
 
-    public static User of(String email, String password, LocalDate expirationPasswordDate, Boolean active, List<String> profiles) {
+    public static User of(String email, String password, LocalDate expirationPasswordDate, Integer expirationTokenDays, Boolean active, List<String> profiles) {
 
         if (active == Boolean.FALSE) {
             throw new UserException("User inactive.");
@@ -67,4 +63,23 @@ public class User extends SelfValidating<User>{
 
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public LocalDate getExpirationPasswordDate() {
+        return expirationPasswordDate;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public List<Profile> getProfiles() {
+        return profiles;
+    }
 }

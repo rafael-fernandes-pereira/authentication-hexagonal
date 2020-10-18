@@ -155,7 +155,7 @@ public class GenerateTokenTest {
 
         doReturn(outputSearchUser).when(searchUser).searchUser(any());
 
-        doReturn(10).when(config).getExpirationDays();
+        doReturn(10).when(config).getExpirationTokenDays();
 
         doThrow(CreateTokenException.class).when(this.createToken).create(any());
 
@@ -183,7 +183,7 @@ public class GenerateTokenTest {
 
         doReturn(outputSearchUser).when(searchUser).searchUser(any());
 
-        doReturn(10).when(config).getExpirationDays();
+        doReturn(10).when(config).getExpirationTokenDays();
 
         doReturn(easyRandom.nextObject(String.class)).when(createToken).create(any());
 
@@ -215,7 +215,7 @@ public class GenerateTokenTest {
 
         doReturn(outputSearchUser).when(searchUser).searchUser(any());
 
-        doReturn(10).when(config).getExpirationDays();
+        doReturn(10).when(config).getExpirationTokenDays();
 
         doReturn(tokenFake).when(createToken).create(any());
 
