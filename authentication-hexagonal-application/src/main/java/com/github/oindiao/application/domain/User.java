@@ -1,5 +1,6 @@
 package com.github.oindiao.application.domain;
 
+import com.github.oindiao.application.port.GenericInterface;
 import com.github.oindiao.common.exception.UserException;
 import com.github.oindiao.common.validation.SelfValidating;
 
@@ -14,38 +15,44 @@ public class User extends SelfValidating<User>{
 
     @NotEmpty
     @Email
-    private final String email;
+    private String email;
 
     @NotEmpty	
-    private final String password;
+    private String password;
 
-    @NotNull
-    private final LocalDate expirationPasswordDate;
-
-    private final Boolean active;
+    private Boolean active;
 
     @NotNull
     private List<Profile> profiles;
 
+    private GenericInterface.Notification notification;
+
     private User(String email, String password, LocalDate expirationPasswordDate, Boolean active, List<Profile> profiles) {
         this.email = email;
         this.password = password;
-        this.expirationPasswordDate = expirationPasswordDate;
         this.active = active;
         this.profiles = profiles;
+        this.notification = GenericInterface.Notification.create();
         this.validateSelf();
     }
 
+    private User(GenericInterface.Notification notification){
+        this.notification = notification;
+    }
+
+
     public static User of(String email, String password, LocalDate expirationPasswordDate, Integer expirationTokenDays, Boolean active, List<String> profiles) {
 
+        GenericInterface.Notification notification = GenericInterface.Notification.create();
+
         if (active == Boolean.FALSE) {
-            throw new UserException("User inactive.");
+            notification.addError("User inactive.");
         }
 
-        LocalDate todayMinus120Days = LocalDate.now().minusDays(120);
+        LocalDate todayMinus120Days = LocalDate.now().minusDays(expirationTokenDays);
 
         if (expirationPasswordDate.isBefore(todayMinus120Days) || expirationPasswordDate.isEqual(todayMinus120Days)) {
-            throw new UserException("Password expiration");
+            notification.addError("Password is expired");
         }
 
         ArrayList<Profile> profilesEnum = new ArrayList<>();
@@ -54,11 +61,14 @@ public class User extends SelfValidating<User>{
             try {
                 profilesEnum.add(Profile.valueOf(profile));
             } catch (IllegalArgumentException e ){
-                throw new UserException("Wrong profile.", e);
+                notification.addError(String.format("Wrong profile: %s", profile));
             }
 
         }
 
+        if (notification.hasError()) {
+            return new User(notification);
+        }
         return new User(email, password, expirationPasswordDate, active, profilesEnum);
 
     }
@@ -71,15 +81,15 @@ public class User extends SelfValidating<User>{
         return password;
     }
 
-    public LocalDate getExpirationPasswordDate() {
-        return expirationPasswordDate;
-    }
-
     public Boolean getActive() {
         return active;
     }
 
     public List<Profile> getProfiles() {
         return profiles;
+    }
+
+    public GenericInterface.Notification getNotification() {
+        return notification;
     }
 }

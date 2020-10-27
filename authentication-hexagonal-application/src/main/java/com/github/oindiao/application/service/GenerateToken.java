@@ -4,7 +4,6 @@ import com.github.oindiao.application.config.UserConfig;
 import com.github.oindiao.application.domain.User;
 import com.github.oindiao.application.port.in.GenerateTokenUseCase;
 import com.github.oindiao.application.port.out.*;
-import com.github.oindiao.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -29,51 +28,57 @@ public class GenerateToken implements GenerateTokenUseCase {
     }
 
     @Override
-    public String generate(Input input) {
+    public GenerateTokenUseCase.Output execute(Input input) {
 
-        try {
+        ValidateData.Input validateDataInput = ValidateData.Input.of(input.getEmail());
+        ValidateData.Output validateDataOutput = this.validateData.execute(validateDataInput);
 
-            ValidateData.Input validateDataInput = ValidateData.Input.of(input.getEmail());
-
-            this.validateData.validate(validateDataInput);
-
-            SearchUser.Input inputSearchUser = SearchUser.Input.of(input.getEmail());
-
-            SearchUser.Output outputSearchUser = searchUser.searchUser(inputSearchUser);
-
-            User user = User.of(
-                    outputSearchUser.getEmail(),
-                    outputSearchUser.getPassword(),
-                    outputSearchUser.getExpirationPasswordDate(),
-                    this.config.getExpirationTokenDays(),
-                    outputSearchUser.getActive(),
-                    outputSearchUser.getProfiles()
-            );
-
-            ValidateLogin.Input inputValidateUser = ValidateLogin.Input.of(user, input);
-
-            validateLogin.validate(inputValidateUser);
-
-            CreateToken.Input inputCreateToken = CreateToken.Input.of(user, config.getExpirationTokenDays());
-
-            String token = createToken.create(inputCreateToken);
-
-            CacheToken.Input cacheTokenInput = CacheToken.Input.of(token);
-
-            cacheToken.sendToCache(cacheTokenInput);
-
-            return token;
-
-        } catch (ValidateDataException | SearchUserException | ValidateLoginException | CreateTokenException | CacheTokenException e) {
-            log.error("error in {}: {}", e.getClass().getName(), e.getMessage());
-            throw e;
-        } catch (UserException e){
-            log.error("error in create user domain: {}", e.getMessage());
-            throw e;
-        } catch (Exception e){
-            log.error("error in service: {}", e.getMessage());
-            throw new ServiceException("error in service", e);
+        if (validateDataOutput.invalid()){
+            return GenerateTokenUseCase.Output.error(validateDataOutput.getNotification());
         }
+
+        SearchUser.Input searchUserInput = SearchUser.Input.of(input.getEmail());
+        SearchUser.Output outputSearchUser = this.searchUser.execute(searchUserInput);
+
+        if (outputSearchUser.getNotification().hasError()){
+            return GenerateTokenUseCase.Output.error(outputSearchUser.getNotification());
+        }
+
+        User user = User.of(
+                outputSearchUser.getEmail(),
+                outputSearchUser.getPassword(),
+                outputSearchUser.getExpirationPasswordDate(),
+                this.config.getExpirationTokenDays(),
+                outputSearchUser.getActive(),
+                outputSearchUser.getProfiles()
+        );
+
+        if (user.getNotification().hasError()){
+            return GenerateTokenUseCase.Output.error(user.getNotification());
+        }
+
+        ValidateLogin.Input validateLoginInput = ValidateLogin.Input.of(user, input);
+        ValidateLogin.Output validateLoginOutput = this.validateLogin.execute(validateLoginInput);
+
+        if (validateLoginOutput.invalid()){
+            return GenerateTokenUseCase.Output.error(validateLoginOutput.getNotification());
+        }
+
+        CreateToken.Input createTokenInput = CreateToken.Input.of(user, config.getExpirationTokenDays());
+        CreateToken.Output createTokenOutput = this.createToken.execute(createTokenInput);
+
+        if (createTokenOutput.getNotification().hasError()){
+            return GenerateTokenUseCase.Output.error(createTokenOutput.getNotification());
+        }
+
+        CacheToken.Input cacheTokenInput = CacheToken.Input.of(createTokenOutput.getToken());
+        CacheToken.Output cacheTokenOutput = this.cacheToken.execute(cacheTokenInput);
+
+        if (cacheTokenOutput.invalid()){
+            return GenerateTokenUseCase.Output.error(cacheTokenOutput.getNotification());
+        }
+
+        return GenerateTokenUseCase.Output.of(createTokenOutput.getToken());
 
     }
 }

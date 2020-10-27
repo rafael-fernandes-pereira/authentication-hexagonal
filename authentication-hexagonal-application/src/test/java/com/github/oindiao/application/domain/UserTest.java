@@ -1,21 +1,19 @@
 package com.github.oindiao.application.domain;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
+import com.github.oindiao.application.config.UserConfig;
+import com.github.oindiao.common.util.EasyRandomWithEmail;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 
-import com.github.oindiao.application.config.UserConfig;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import com.github.oindiao.common.exception.UserException;
-import com.github.oindiao.common.util.EasyRandomWithEmail;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class UserTest {
 
@@ -38,16 +36,20 @@ public class UserTest {
         // Arrange
         LocalDate todayMinus121Days = this.today.minusDays(121);
 
-        // Act - Assert
-        assertThrows(UserException.class, () ->
-                User.of(easyRandom.email(),
-                        easyRandom.nextObject(String.class),
-                        todayMinus121Days,
-                        config.getExpirationTokenDays(),
-                        Boolean.TRUE,
-                        Arrays.asList(easyRandom.nextObject(Profile.class).name())
-                )
+        // Act
+
+        User user = User.of(easyRandom.email(),
+                easyRandom.nextObject(String.class),
+                todayMinus121Days,
+                config.getExpirationTokenDays(),
+                Boolean.TRUE,
+                Arrays.asList(easyRandom.nextObject(Profile.class).name())
         );
+
+        // Assert
+
+        assertTrue(user.getNotification().hasError());
+        assertThat(user.getNotification().getErrors(), hasItems("Password is expired"));
     }
 
     @Test
@@ -57,16 +59,20 @@ public class UserTest {
         // Arrange
         LocalDate todayMinus120Days = this.today.minusDays(120);
 
-        // Act - Assert
-        assertThrows(UserException.class, () ->
-                User.of(easyRandom.email(),
-                        easyRandom.nextObject(String.class),
-                        todayMinus120Days,
-                        config.getExpirationTokenDays(),
-                        Boolean.TRUE,
-                        Arrays.asList(easyRandom.nextObject(Profile.class).name())
-                )
+        // Act
+
+        User user = User.of(easyRandom.email(),
+                easyRandom.nextObject(String.class),
+                todayMinus120Days,
+                config.getExpirationTokenDays(),
+                Boolean.TRUE,
+                Arrays.asList(easyRandom.nextObject(Profile.class).name())
         );
+
+        // Assert
+
+        assertTrue(user.getNotification().hasError());
+        assertThat(user.getNotification().getErrors(), hasItems("Password is expired"));
     }
 
     @Test
@@ -96,16 +102,20 @@ public class UserTest {
 
         String profile = this.easyRandom.nextObject(String.class);
 
-        // Act - Assert
-        assertThrows(UserException.class, () ->
-                User.of(easyRandom.email(),
-                        easyRandom.nextObject(String.class),
-                        LocalDate.now(),
-                        config.getExpirationTokenDays(),
-                        Boolean.TRUE,
-                        Arrays.asList(profile)
-                )
+        // Act
+
+        User user = User.of(easyRandom.email(),
+                easyRandom.nextObject(String.class),
+                LocalDate.now(),
+                config.getExpirationTokenDays(),
+                Boolean.TRUE,
+                Arrays.asList(profile)
         );
+
+        // Assert
+
+        assertTrue(user.getNotification().hasError());
+        assertThat(user.getNotification().getErrors(), hasItems(String.format("Wrong profile: %s", profile)));
 
     }
 
@@ -138,16 +148,20 @@ public class UserTest {
 
         Boolean active = Boolean.FALSE;
 
-        // Act - Assert
-        assertThrows(UserException.class, () ->
-                User.of(easyRandom.email(),
-                        easyRandom.nextObject(String.class),
-                        LocalDate.now(),
-                        config.getExpirationTokenDays(),
-                        active,
-                        Arrays.asList(easyRandom.nextObject(Profile.class).name())
-                )
+        // Assert
+
+        User user = User.of(easyRandom.email(),
+                easyRandom.nextObject(String.class),
+                LocalDate.now(),
+                config.getExpirationTokenDays(),
+                active,
+                Arrays.asList(easyRandom.nextObject(Profile.class).name())
         );
+
+        // Assert
+
+        assertTrue(user.getNotification().hasError());
+        assertThat(user.getNotification().getErrors(), hasItems("User inactive."));
 
     }
 

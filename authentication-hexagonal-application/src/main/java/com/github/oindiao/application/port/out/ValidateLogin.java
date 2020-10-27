@@ -1,6 +1,7 @@
 package com.github.oindiao.application.port.out;
 
 import com.github.oindiao.application.domain.User;
+import com.github.oindiao.application.port.GenericInterface;
 import com.github.oindiao.application.port.in.GenerateTokenUseCase;
 import com.github.oindiao.common.validation.SelfValidating;
 
@@ -8,9 +9,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-public interface ValidateLogin {
-
-    void validate(ValidateLogin.Input input);
+public interface ValidateLogin extends GenericInterface<ValidateLogin.Input, ValidateLogin.Output> {
 
     class Input extends SelfValidating<ValidateLogin.Input> {
 
@@ -45,6 +44,27 @@ public interface ValidateLogin {
 
         public String getPassword() {
             return password;
+        }
+    }
+
+    class Output {
+
+        private final GenericInterface.Notification notification;
+
+        private Output(GenericInterface.Notification notification){
+            this.notification = notification;
+        }
+
+        public static Output of(GenericInterface.Notification notification){
+            return new Output(notification);
+        }
+
+        public Boolean invalid() {
+            return this.notification != null;
+        }
+
+        public GenericInterface.Notification getNotification() {
+            return notification;
         }
     }
 

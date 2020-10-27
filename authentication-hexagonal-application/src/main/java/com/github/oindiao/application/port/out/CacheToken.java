@@ -1,12 +1,11 @@
 package com.github.oindiao.application.port.out;
 
+import com.github.oindiao.application.port.GenericInterface;
 import com.github.oindiao.common.validation.SelfValidating;
 
 import javax.validation.constraints.NotEmpty;
 
-public interface CacheToken {
-
-    void sendToCache(Input input);
+public interface CacheToken extends GenericInterface<CacheToken.Input, CacheToken.Output>{
 
     class Input extends SelfValidating<CacheToken.Input> {
 
@@ -25,6 +24,28 @@ public interface CacheToken {
         public String getToken() {
             return token;
         }
+    }
+
+    class Output {
+
+        private Notification notification;
+
+        private Output(Notification notification){
+            this.notification = notification;
+        }
+
+        public static Output of(Notification notification){
+            return new Output(notification);
+        }
+
+        public Boolean invalid() {
+            return this.notification != null;
+        }
+
+        public Notification getNotification() {
+            return notification;
+        }
+
     }
 
 }

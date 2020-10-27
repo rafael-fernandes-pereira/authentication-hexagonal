@@ -2,6 +2,7 @@ package com.github.oindiao.application.port.out;
 
 import com.github.oindiao.application.domain.Profile;
 import com.github.oindiao.application.domain.User;
+import com.github.oindiao.application.port.GenericInterface;
 import com.github.oindiao.common.validation.SelfValidating;
 
 import javax.validation.constraints.Email;
@@ -11,9 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface CreateToken {
-
-    String create(CreateToken.Input input);
+public interface CreateToken extends GenericInterface<CreateToken.Input, CreateToken.Output> {
 
     class Input extends SelfValidating<CreateToken.Input> {
 
@@ -56,6 +55,40 @@ public interface CreateToken {
 
         public LocalDate getExpirationToken() {
             return expirationToken;
+        }
+    }
+
+    class Output extends SelfValidating<CreateToken.Output> {
+
+        @NotEmpty
+        private String token;
+
+        private Notification notification;
+
+        private Output(String token){
+            this.token = token;
+            this.notification = Notification.create();
+            this.validateSelf();
+        }
+
+        private Output(Notification notification){
+            this.notification = notification;
+        }
+
+        public static Output of(String token){
+            return new Output(token);
+        }
+
+        public static Output error(Notification notification){
+            return new Output(notification);
+        }
+
+        public Notification getNotification() {
+            return notification;
+        }
+
+        public String getToken() {
+            return token;
         }
     }
 

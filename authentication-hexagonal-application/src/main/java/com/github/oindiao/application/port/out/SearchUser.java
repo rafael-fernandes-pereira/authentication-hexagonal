@@ -1,5 +1,6 @@
 package com.github.oindiao.application.port.out;
 
+import com.github.oindiao.application.port.GenericInterface;
 import com.github.oindiao.common.validation.SelfValidating;
 
 import javax.validation.constraints.Email;
@@ -8,9 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface SearchUser {
-
-    Output searchUser(Input input);
+public interface SearchUser extends GenericInterface<SearchUser.Input, SearchUser.Output> {
 
     class Input extends SelfValidating<SearchUser.Input> {
 
@@ -36,18 +35,20 @@ public interface SearchUser {
 
         @NotEmpty
         @Email
-        private final String email;
+        private String email;
 
         @NotEmpty
-        private final String password;
+        private String password;
 
         @NotNull
-        private final List<String> profiles;
+        private List<String> profiles;
 
         @NotNull
-        private final LocalDate expirationPasswordDate;
+        private LocalDate expirationPasswordDate;
 
-        private final Boolean active;
+        private Boolean active;
+
+        private Notification notification;
 
         private Output(String email, String password, List<String> profiles, @NotNull LocalDate expirationPasswordDate, Boolean active) {
             this.email = email;
@@ -55,12 +56,20 @@ public interface SearchUser {
             this.profiles = profiles;
             this.expirationPasswordDate = expirationPasswordDate;
             this.active = active;
+            this.notification = GenericInterface.Notification.create();
             this.validateSelf();
+        }
 
+        private Output(Notification notification){
+            this.notification = notification;
         }
 
         public static Output of(String email, String password, List<String> profiles, LocalDate expirationPasswordDate, Boolean active){
             return new Output(email, password, profiles, expirationPasswordDate, active);
+        }
+
+        public static Output error(Notification notification){
+            return new Output(notification);
         }
 
         public String getEmail() {
@@ -83,6 +92,9 @@ public interface SearchUser {
             return expirationPasswordDate;
         }
 
+        public Notification getNotification() {
+            return notification;
+        }
     }
 
 }
