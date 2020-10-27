@@ -2,11 +2,9 @@ package com.github.oindiao.application.service;
 
 import com.github.oindiao.application.config.UserConfig;
 import com.github.oindiao.application.domain.Profile;
-import com.github.oindiao.application.domain.User;
 import com.github.oindiao.application.port.GenericInterface;
 import com.github.oindiao.application.port.in.GenerateTokenUseCase;
 import com.github.oindiao.application.port.out.*;
-import com.github.oindiao.common.exception.*;
 import com.github.oindiao.common.util.EasyRandomWithEmail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,9 +19,10 @@ import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GenerateTokenTest {
